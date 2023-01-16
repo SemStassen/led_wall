@@ -4,10 +4,12 @@
 const rows = 10;
 const columns = 10;
 const leds = 100;
-const rectWidth = 100;
-const rectHeight = 100;
+const rectWidth = 75;
+const rectHeight = 75;
 const marginLeft = 500;
 
+let radio; 
+let colorVal;
 let ledsJson;
 let x;
 let y;
@@ -16,7 +18,7 @@ let ledCounterDraw;
 
 // import json file
 function preload() {
-  ledsJson = loadJSON('json/leds.json');
+  ledsJson = loadJSON('json/leds.json');  
 }
 
 function setup() {
@@ -29,10 +31,10 @@ function setup() {
   if (!ledsJson) {
     ledsJson = [];
     prepareJSON();
-  }
+  } 
+    drawStartingGrid();
   
   // Draw grid (also used to update grid)
-  drawStartingGrid();
 }
 
 function addButtons() {
@@ -45,6 +47,13 @@ function addButtons() {
   let postButton = createButton('POST JSON');
   postButton.position(50, 130);
   postButton.mousePressed(postJSON);
+
+  // ADD BLACK / WHITE RADIO BUTTONS
+  radio = createRadio();
+  radio.option(255, 'white');
+  radio.option(0, 'black');
+  radio.selected('255');
+  radio.position(50, 230);
 }
 
 function exportJSON() {
@@ -67,7 +76,7 @@ function prepareJSON() {
      for(j = 0; j < columns; j++) {
         ledsJson.push({
           "id": ledCounter,
-          "value": 0,
+          "value": '0',
         })
         ledCounter++;
        if (ledCounter == leds) { 
@@ -83,7 +92,7 @@ function drawStartingGrid() {
  loop1: 
   for(i = 0; i < rows; i++) {
     for(j = 0; j < columns; j++) {
-      fill(ledsJson[ledCounter].value * 255);
+      fill(Number(ledsJson[ledCounter].value));
       rect((j * rectWidth) + marginLeft, (i * rectHeight), rectWidth, rectHeight);
       fill(255, 0, 0);
       text(ledCounter, (j * rectWidth) + marginLeft, (i * rectHeight) + rectHeight);
@@ -108,14 +117,10 @@ function draw() {
 
   if (ledCounterDraw != prevLedCounter || prevLedCounter == null) {
     // Flips led value
-    if(ledsJson[ledCounterDraw].value == 1) {
-      ledsJson[ledCounterDraw].value = 0
-    } else {
-      ledsJson[ledCounterDraw].value = 1
-    };
+    ledsJson[ledCounterDraw].value = colorVal
 
      // update pressed led
-      fill(ledsJson[ledCounterDraw].value * 255);
+      fill(Number(colorVal));
       rect((x * rectWidth) + marginLeft, (y * rectHeight), rectWidth, rectHeight);
 
       // Add led number
@@ -124,6 +129,10 @@ function draw() {
      }
       prevLedCounter = ledCounterDraw;
   }
+}
+
+function mousePressed() {
+ colorVal = radio.value();
 }
 
 
